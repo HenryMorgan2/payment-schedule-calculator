@@ -1,14 +1,13 @@
 package com.github.henrymorgan2.paymentschedulecalculator.controllers;
 
-import com.github.henrymorgan2.paymentschedulecalculator.cleint.PaymentScheduleCalculatorExternalApi;
-import com.github.henrymorgan2.paymentschedulecalculator.cleint.PaymentScheduleCalculatorCleintResponceDTO;
 import com.github.henrymorgan2.paymentschedulecalculator.dto.RequestDTO;
 import com.github.henrymorgan2.paymentschedulecalculator.service.PaymentScheduleCalculatorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 
@@ -25,14 +24,5 @@ public class PaymentScheduleCalculatorController {
         List<HashMap> paymentSchedule = paymentScheduleCalculatorService.getPaymentSchedule(requestDTO);
 
         return "OK";
-//        LocalDate.now().plusMonths(term+1); //- окончание периода
-//        LocalDate.now() ///- начало периода
-//        //LocalDate вынести в отдельную переменную
-//        //Вместо double использовать BigDecimal
-
-
-
-
     }
-
 }

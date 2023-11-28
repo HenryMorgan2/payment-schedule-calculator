@@ -1,7 +1,5 @@
 package com.github.henrymorgan2.paymentschedulecalculator.service;
 
-import ch.qos.logback.core.joran.conditional.IfAction;
-import com.github.henrymorgan2.paymentschedulecalculator.cleint.PaymentScheduleCalculatorCleintResponceDTO;
 import com.github.henrymorgan2.paymentschedulecalculator.cleint.PaymentScheduleCalculatorExternalApi;
 import com.github.henrymorgan2.paymentschedulecalculator.dto.RequestDTO;
 import lombok.Data;
@@ -12,7 +10,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,7 +22,7 @@ public class PaymentScheduleCalculatorService {
 
 
         String start = localDate.toString();
-        String end = localDate.plusMonths(term.longValue() +1).toString();
+        String end = localDate.plusMonths(term.longValue() + 1).toString();
 
         return paymentScheduleCalculatorExternalApi.getNonWorkingCalendar(start, end).getNonWorkingDays();
     }
@@ -35,7 +32,7 @@ public class PaymentScheduleCalculatorService {
         double pc = interestRate.doubleValue() / (100 * 12);
         double o = initialPrincipalAmount.doubleValue();
         double pp = -term.doubleValue();
-        return o * (pc/(1-Math.pow((1+pc), pp)));
+        return o * (pc / (1 - Math.pow((1 + pc), pp)));
 
     }
 
@@ -57,8 +54,8 @@ public class PaymentScheduleCalculatorService {
         int intTerm = term.intValue();
 
         double balanceOwed = initialPrincipalAmount.doubleValue();
-        double interestRatePerYear = interestRate.doubleValue() /100;
-        while (i <= intTerm){
+        double interestRatePerYear = interestRate.doubleValue() / 100;
+        while (i <= intTerm) {
             LocalDate plusMonthsPonts = localDate.plusMonths(i + 1);
 
             String plusMonthsPontsVerify = String.valueOf(plusMonthsPonts.getMonthValue());
@@ -66,7 +63,7 @@ public class PaymentScheduleCalculatorService {
                 plusMonthsPontsVerify = "0" + plusMonthsPontsVerify;
             }
 
-            LocalDate parsePaymentDay = LocalDate.parse( plusMonthsPonts.getYear() + "-" + plusMonthsPontsVerify + "-" + paymentDayVerify);
+            LocalDate parsePaymentDay = LocalDate.parse(plusMonthsPonts.getYear() + "-" + plusMonthsPontsVerify + "-" + paymentDayVerify);
 
             //Дата платежа
             LocalDate workingDayOfPayment = findElementInArray(nonWorkingCalendar, parsePaymentDay);
@@ -83,11 +80,10 @@ public class PaymentScheduleCalculatorService {
         }
 
 
-
         return new ArrayList<>();
     }
 
-    private LocalDate findElementInArray(List<LocalDate> nonWorkingCalendar, LocalDate parsePaymentDay){
+    private LocalDate findElementInArray(List<LocalDate> nonWorkingCalendar, LocalDate parsePaymentDay) {
 
         LocalDate result = parsePaymentDay;
 
@@ -135,9 +131,6 @@ public class PaymentScheduleCalculatorService {
 
         return new ArrayList<>();
     }
-
-
-
 
 
 }
