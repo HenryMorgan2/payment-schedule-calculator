@@ -6,9 +6,10 @@ spring:
       client:
         config:
           getNonWorkingDays:
-            url: http://localhost:8080/api/non-working-days
+            url: http://localhost:${wiremock.server.port}/api/non-working-days
             connect-timeout: 5000
             read-timeout: 5000
             errorDecoder: com.github.henrymorgan2.paymentschedulecalculator.cleint.RetryErrorDecoder
             retryer: com.github.henrymorgan2.paymentschedulecalculator.cleint.Retryer
+
 
