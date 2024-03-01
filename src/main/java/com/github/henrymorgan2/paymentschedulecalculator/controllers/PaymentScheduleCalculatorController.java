@@ -1,5 +1,6 @@
 package com.github.henrymorgan2.paymentschedulecalculator.controllers;
 
+import com.github.henrymorgan2.paymentschedulecalculator.dto.EntryPaymentShedule;
 import com.github.henrymorgan2.paymentschedulecalculator.dto.RequestDTO;
 import com.github.henrymorgan2.paymentschedulecalculator.service.PaymentScheduleCalculatorService;
 import com.github.henrymorgan2.paymentschedulecalculator.utils.GenerationPDF;
@@ -25,15 +26,18 @@ public class PaymentScheduleCalculatorController {
     @PostMapping("/calculate-payment-schedule")
     public String getAPaymentSchedule(@RequestBody() RequestDTO requestDTO) throws DocumentException, IOException {
 
+
+        List<EntryPaymentShedule> paymentSchedule = paymentScheduleCalculatorService.getPaymentSchedule(requestDTO);
+
         try {
-            generationPDF.generatePdfFromHtml(generationPDF.parseThymeleafTemplate());
-        } catch (DocumentException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+//            generationPDF.generatePdfFromHtmlOld(generationPDF.parseThymeleafTemplate(paymentSchedule));
+            generationPDF.generatePdfFromHtml(paymentSchedule);
+        } catch (IOException | com.itextpdf.text.DocumentException e) {
             throw new RuntimeException(e);
         }
 
-        List<HashMap> paymentSchedule = paymentScheduleCalculatorService.getPaymentSchedule(requestDTO);
+
+
 
         return "OK";
     }

@@ -1,36 +1,31 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" >
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title></title>
+</head>
+
 <body>
-
-<table>
+<table border="1">
+    <thead>
     <tr>
-        <th>Дата платежа TEST</th>
-        <th>PRICE</th>
-<!--        <th>IN STOCK</th>-->
+        <th>Day of payment</th>
+        <th>Payment amount</th>
+        <th>Interest amount</th>
+        <th>Loan body</th>
+        <th>Balance owed</th>
     </tr>
+    </thead>
 
-
-        <th:block th:each="map : ${list}">
-            <tr th:each="e : ${map}">
-                <td th:text="${e.key}"></td>
-                <td th:text="${e.value}"></td>
-            </tr>
-        </th:block>
-
-<!--    <tr th:each="prod : ${prods}">-->
-
-<!--        <td th:text="${prod.name}">Onions</td>-->
-<!--        <td th:text="${prod.price}">2.41</td>-->
-<!--        <td th:text="${prod.inStock}? #{true} : #{false}">yes</td>-->
-<!--    </tr>-->
-
+    <tbody>
+    <tr th:each="e : ${list}">
+        <td th:text="${e.workingDayOfPayment}"></td>
+        <td th:text="${e.monthlyPaymentAmount}"></td>
+        <td th:text="${e.interestAmountPerMonth}"></td>
+        <td th:text="${e.loanBody}"></td>
+        <td th:text="${e.balanceOwed}"></td>
+    </tr>
+    </tbody>
 </table>
-
-
-<!--<h3 style="text-align: center; color: green">-->
-<!--    &lt;!&ndash;            <span th:text="'Welcome to ' + ${to} + '!'"></span>&ndash;&gt;-->
-<!--    <span th:text="Welcome"></span>-->
-
-<!--</h3>-->
 </body>
 </html>
