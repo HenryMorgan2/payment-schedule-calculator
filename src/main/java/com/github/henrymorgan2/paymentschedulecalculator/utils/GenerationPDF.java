@@ -22,16 +22,16 @@ import java.util.stream.Stream;
 @Component
 public class GenerationPDF{
 
+    public byte[] generatePdfFromHtml(List<EntryPaymentShedule> list) throws FileNotFoundException, com.itextpdf.text.DocumentException {
 
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-    public void generatePdfFromHtml(List<EntryPaymentShedule> list) throws FileNotFoundException, com.itextpdf.text.DocumentException {
-
-        String outputFolder = System.getProperty("user.home") + File.separator + "thymeleaf.pdf";
-        OutputStream outputStream = new FileOutputStream(outputFolder);
+//        String outputFolder = System.getProperty("user.home") + File.separator + "thymeleaf.pdf";
+//        OutputStream outputStream = new FileOutputStream(outputFolder);
         Document document = new Document();
-        PdfWriter.getInstance(document, outputStream);
+//        PdfWriter.getInstance(document, outputStream);
+        PdfWriter.getInstance(document, byteArrayOutputStream);
         document.open();
-
 
         PdfPTable table = new PdfPTable(5);
         addTableHeader(table);
@@ -40,6 +40,7 @@ public class GenerationPDF{
         document.add(table);
         document.close();
 
+        return byteArrayOutputStream.toByteArray();
 
     }
 
@@ -66,7 +67,6 @@ public class GenerationPDF{
         }
 
     }
-
 
     public String parseThymeleafTemplate(List<EntryPaymentShedule> list) {
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
