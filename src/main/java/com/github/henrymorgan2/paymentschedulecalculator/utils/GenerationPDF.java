@@ -2,12 +2,10 @@ package com.github.henrymorgan2.paymentschedulecalculator.utils;
 
 import com.github.henrymorgan2.paymentschedulecalculator.dto.EntryPaymentShedule;
 import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfDocument;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.lowagie.text.DocumentException;
-import org.springframework.core.convert.converter.GenericConverter;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -26,10 +24,8 @@ public class GenerationPDF{
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-//        String outputFolder = System.getProperty("user.home") + File.separator + "thymeleaf.pdf";
-//        OutputStream outputStream = new FileOutputStream(outputFolder);
         Document document = new Document();
-//        PdfWriter.getInstance(document, outputStream);
+
         PdfWriter.getInstance(document, byteArrayOutputStream);
         document.open();
 
