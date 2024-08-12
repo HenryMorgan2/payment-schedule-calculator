@@ -16,14 +16,22 @@
 	<properties>
 		<java.version>17</java.version>
 		<spring-cloud.version>2023.0.0-RC1</spring-cloud.version>
-		<wiremock>4.0.4</wiremock>
+		<wiremock.version>4.0.4</wiremock.version>
 		<junit.jupiter.version>5.10.0</junit.jupiter.version>
 		<mockito-junit-jupiter.version>5.3.1</mockito-junit-jupiter.version>
 		<thymeleaf.version>3.1.2.RELEASE</thymeleaf.version>
-		<xhtmlrenderer.version>9.1.20</xhtmlrenderer.version>
-		<itextpdf>5.5.13.3</itextpdf>
+		<avro.version>1.8.2</avro.version>
+		<kafka-avro-serializer.version>4.0.0</kafka-avro-serializer.version>
+		<spring-kafka.version>3.2.2</spring-kafka.version>
+<!--		<xhtmlrenderer.version>9.1.20</xhtmlrenderer.version>-->
+		<itextpdf.version>5.5.13.3</itextpdf.version>
 	</properties>
 	<dependencies>
+		<dependency>
+			<groupId>org.apache.avro</groupId>
+			<artifactId>avro</artifactId>
+			<version>${avro.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -33,11 +41,11 @@
 			<artifactId>thymeleaf</artifactId>
 			<version>${thymeleaf.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.xhtmlrenderer</groupId>
-			<artifactId>flying-saucer-pdf</artifactId>
-			<version>${xhtmlrenderer.version}</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.xhtmlrenderer</groupId>-->
+<!--			<artifactId>flying-saucer-pdf</artifactId>-->
+<!--			<version>${xhtmlrenderer.version}</version>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -53,7 +61,7 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-contract-wiremock</artifactId>
-			<version>${wiremock}</version>
+			<version>${wiremock.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.kafka</groupId>
@@ -89,7 +97,12 @@
 		<dependency>
 			<groupId>com.itextpdf</groupId>
 			<artifactId>itextpdf</artifactId>
-			<version>${itextpdf}</version>
+			<version>${itextpdf.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
+			<version>${spring-kafka.version}</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
@@ -118,9 +131,33 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.avro</groupId>
+				<artifactId>avro-maven-plugin</artifactId>
+				<version>${avro.version}</version>
+				<executions>
+					<execution>
+						<id>schemas</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>schema</goal>
+							<goal>protocol</goal>
+							<goal>idl-protocol</goal>
+						</goals>
+						<configuration>
+							<sourceDirectory>${project.basedir}/src/main/resources/</sourceDirectory>
+							<outputDirectory>${project.basedir}/src/main/java/</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 	<repositories>
+		<repository>
+			<id>confluent</id>
+			<url>https://packages.confluent.io/maven/</url>
+		</repository>
 		<repository>
 			<id>spring-milestones</id>
 			<name>Spring Milestones</name>

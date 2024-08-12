@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @RequiredArgsConstructor
 @AllArgsConstructor
@@ -15,7 +16,7 @@ import java.math.BigDecimal;
 
 public class EntryPaymentShedule implements Serializable {
 
-    private String workingDayOfPayment;
+    private LocalDate workingDayOfPayment;
     private BigDecimal monthlyPaymentAmount;
     private BigDecimal interestAmountPerMonth;
     private BigDecimal loanBody;

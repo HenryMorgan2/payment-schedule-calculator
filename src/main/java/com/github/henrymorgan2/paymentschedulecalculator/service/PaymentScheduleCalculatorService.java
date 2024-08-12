@@ -9,6 +9,7 @@ import lombok.Data;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -40,48 +41,35 @@ public class PaymentScheduleCalculatorService {
         return response;
     }
 
-    private BigDecimal getMonthlyPaymentAmount(BigDecimal initialPrincipalAmount, BigDecimal interestRate, BigDecimal term) {
+    private BigDecimal getMonthlyPaymentAmount(BigDecimal initialPrincipalAmount, BigDecimal interestRate, int term) {
+        MathContext mathContext = new MathContext(2, RoundingMode.HALF_UP);
+        BigDecimal pc = interestRate.divide(BigDecimal.valueOf(1200), mathContext);
+        int pp = -term;
+        return initialPrincipalAmount.multiply(pc.divide(BigDecimal.ONE.subtract((BigDecimal.ONE.add(pc)).pow(pp, mathContext)), mathContext)).setScale(2, RoundingMode.HALF_UP);
 
-        double pc = interestRate.doubleValue() / (100 * 12);
-        double o = initialPrincipalAmount.doubleValue();
-        double pp = -term.doubleValue();
-
-        //Преобразуем в BigDecimal, округляем в большую сторону и возвращаем double
-        return  new BigDecimal(o * (pc / (1 - Math.pow((1 + pc), pp)))).setScale(2, RoundingMode.HALF_UP);
     }
 
     private List<EntryPaymentShedule> getCalculatePaymentSchedule(BigDecimal monthlyPaymentAmount,
-                                                      List<LocalDate> nonWorkingCalendar,
-                                                      BigDecimal initialPrincipalAmount,
-                                                      BigDecimal interestRate,
-                                                      BigDecimal term,
-                                                      BigDecimal paymentDay,
-                                                      LocalDate localDate) {
+                                                                  List<LocalDate> nonWorkingCalendar,
+                                                                  BigDecimal initialPrincipalAmount,
+                                                                  BigDecimal interestRate,
+                                                                  int term,
+                                                                  int paymentDay,
+                                                                  LocalDate localDate) {
 
-
+        MathContext mathContext = new MathContext(2, RoundingMode.HALF_UP);
         List<EntryPaymentShedule> entryPaymentShedules = new ArrayList<>();
 
-        String paymentDayVerify = paymentDay.toString();
-        if (paymentDay.intValue() < 10) {
-            paymentDayVerify = "0" + paymentDayVerify;
-        }
 
-        int i = 0;
-        int intTerm = term.intValue();
-
-        BigDecimal sumInterestAmountPerMonth = new BigDecimal(0);
-        BigDecimal sumLoanBody = new BigDecimal(0);
+        BigDecimal sumInterestAmountPerMonth = BigDecimal.ZERO;
+        BigDecimal sumLoanBody = BigDecimal.ZERO;
         BigDecimal balanceOwed = initialPrincipalAmount;
-        BigDecimal interestMonthRate = interestRate.divide(interestRate.multiply(new BigDecimal(100)));
-        while (i < intTerm) {
+        BigDecimal interestMonthRate = interestRate.divide(interestRate.multiply(new BigDecimal(100)), mathContext);
+
+        for (int i = 0; i < term; i++) {
             LocalDate plusMonthsPonts = localDate.plusMonths(i + 1);
 
-            String plusMonthsPontsVerify = String.valueOf(plusMonthsPonts.getMonthValue());
-            if (plusMonthsPonts.getMonthValue() < 10) {
-                plusMonthsPontsVerify = "0" + plusMonthsPontsVerify;
-            }
-
-            LocalDate parsePaymentDay = LocalDate.parse(plusMonthsPonts.getYear() + "-" + plusMonthsPontsVerify + "-" + paymentDayVerify);
+            LocalDate parsePaymentDay = LocalDate.of(plusMonthsPonts.getYear(), plusMonthsPonts.getMonthValue(), paymentDay);
 
             //Дата платежа
             LocalDate workingDayOfPayment = findElementInArray(nonWorkingCalendar, parsePaymentDay);
@@ -97,14 +85,12 @@ public class PaymentScheduleCalculatorService {
             balanceOwed = balanceOwed.subtract(monthlyPaymentAmount.subtract(interestAmountPerMonth));
 
             //Убираем потерю точности
-            if (i == intTerm - 1 | balanceOwed.compareTo(new BigDecimal(0)) <= 0){
+            if (i == term - 1 | balanceOwed.compareTo(BigDecimal.ZERO) <= 0){
 
-                balanceOwed = new BigDecimal(0);
+                balanceOwed = BigDecimal.ZERO;
             }
 
-            entryPaymentShedules.add(new EntryPaymentShedule(workingDayOfPayment.toString(),monthlyPaymentAmount,interestAmountPerMonth,loanBody,balanceOwed));
-
-            i++;
+            entryPaymentShedules.add(new EntryPaymentShedule(workingDayOfPayment, monthlyPaymentAmount, interestAmountPerMonth, loanBody, balanceOwed));
         }
         System.out.println("Сумма процентов: " + sumInterestAmountPerMonth + " тело кредита: " + sumLoanBody);
 
@@ -115,20 +101,9 @@ public class PaymentScheduleCalculatorService {
 
         LocalDate result = parsePaymentDay;
 
-        if (nonWorkingCalendar.stream().filter(localDateNonWorkingCalendar -> localDateNonWorkingCalendar.equals(parsePaymentDay)).collect(Collectors.toList()).size() > 0) {
-
+        if (nonWorkingCalendar.contains(parsePaymentDay)) {
             int parsePaymentDayUp = parsePaymentDay.plusDays(1).getDayOfMonth();
-
-            String paymentDayVerify = String.valueOf(parsePaymentDayUp);
-            if (parsePaymentDayUp < 10) {
-                paymentDayVerify = "0" + paymentDayVerify;
-            }
-            String paymentMonthVerify = String.valueOf(parsePaymentDay.getMonthValue());
-            if (parsePaymentDay.getMonthValue() < 10) {
-                paymentMonthVerify = "0" + paymentMonthVerify;
-            }
-
-            result = LocalDate.parse(parsePaymentDay.getYear() + "-" + paymentMonthVerify + "-" + paymentDayVerify);
+            result = LocalDate.of(parsePaymentDay.getYear(), parsePaymentDay.getMonthValue(), parsePaymentDayUp);
             return findElementInArray(nonWorkingCalendar, result);
 
         }
@@ -141,21 +116,16 @@ public class PaymentScheduleCalculatorService {
         String user_email = requestDTO.getUser_email();
         BigDecimal initialPrincipalAmount = requestDTO.getInitialPrincipalAmount(); //сумма кредита
         BigDecimal interestRate = requestDTO.getInterestRate(); //годовая ставка по кредиту
-        BigDecimal term = requestDTO.getTerm(); //срок кредита в месяцах
-        BigDecimal paymentDay = requestDTO.getPaymentDay(); //дата платежа
+        int term = requestDTO.getTerm().intValue(); //срок кредита в месяцах
+        int paymentDay = requestDTO.getPaymentDay().intValue(); //дата платежа
         LocalDate localDate = LocalDate.now();
 
         BigDecimal monthlyPaymentAmount = getMonthlyPaymentAmount(initialPrincipalAmount, interestRate, term); //сумма платежа в месяц
 
         LocalDate start = localDate;
-        LocalDate end = localDate.plusMonths(term.longValue() + 1);
+        LocalDate end = localDate.plusMonths(term + 1);
 
         List<LocalDate> nonWorkingCalendar = getNonWorkingDays(start, end);
-
-//        for (LocalDate entry: nonWorkingCalendar) {
-//            System.out.println(entry);
-//        }
-
 
         List<EntryPaymentShedule> calculatePaymentSchedule = getCalculatePaymentSchedule(monthlyPaymentAmount,
                 nonWorkingCalendar,
