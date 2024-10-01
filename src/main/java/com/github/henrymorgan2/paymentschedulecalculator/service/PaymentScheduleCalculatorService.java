@@ -14,7 +14,6 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Data
@@ -28,13 +27,12 @@ public class PaymentScheduleCalculatorService {
 
         try {
             response = nonWorkingCalendarClient.getNonWorkingDays(start, end).getNonWorkingDays();
-        }catch (FeignException exception){
+        } catch (FeignException exception) {
             String responseBody = null;
-            if (exception.responseBody().isPresent()){
+            if (exception.responseBody().isPresent()) {
                 responseBody = new String(exception.responseBody().get().array());
             }
             throw new HttpRequestException(responseBody, exception.status());
-
 
         }
 
@@ -85,7 +83,7 @@ public class PaymentScheduleCalculatorService {
             balanceOwed = balanceOwed.subtract(monthlyPaymentAmount.subtract(interestAmountPerMonth));
 
             //Убираем потерю точности
-            if (i == term - 1 | balanceOwed.compareTo(BigDecimal.ZERO) <= 0){
+            if (i == term - 1 | balanceOwed.compareTo(BigDecimal.ZERO) <= 0) {
 
                 balanceOwed = BigDecimal.ZERO;
             }
@@ -113,7 +111,7 @@ public class PaymentScheduleCalculatorService {
 
     public List<EntryPaymentShedule> getPaymentSchedule(RequestDTO requestDTO) {
 
-        String user_email = requestDTO.getUser_email();
+        String user_email = requestDTO.getUserEmail();
         BigDecimal initialPrincipalAmount = requestDTO.getInitialPrincipalAmount(); //сумма кредита
         BigDecimal interestRate = requestDTO.getInterestRate(); //годовая ставка по кредиту
         int term = requestDTO.getTerm().intValue(); //срок кредита в месяцах
@@ -137,6 +135,4 @@ public class PaymentScheduleCalculatorService {
 
         return calculatePaymentSchedule;
     }
-
-
 }

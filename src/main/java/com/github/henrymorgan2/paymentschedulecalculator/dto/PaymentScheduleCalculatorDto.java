@@ -1,11 +1,11 @@
 package com.github.henrymorgan2.paymentschedulecalculator.dto;
 
 import lombok.Data;
-import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
 
-@Component
+@RequiredArgsConstructor
 @Data
 public class PaymentScheduleCalculatorDto {
 
-    private String paymentScheduleCalculator;
+    private final String data;
 }

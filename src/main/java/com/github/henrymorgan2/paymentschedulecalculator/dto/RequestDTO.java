@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class RequestDTO {
 
-    private String user_email;
+    private String userEmail;
     private BigDecimal initialPrincipalAmount;
     private BigDecimal interestRate;
     private BigDecimal term;

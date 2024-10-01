@@ -1,21 +1,22 @@
 package com.github.henrymorgan2.paymentschedulecalculator.controllers;
 
 import com.github.henrymorgan2.paymentschedulecalculator.dto.EntryPaymentShedule;
+import com.github.henrymorgan2.paymentschedulecalculator.dto.PaymentScheduleCalculatorDto;
 import com.github.henrymorgan2.paymentschedulecalculator.dto.RequestDTO;
 import com.github.henrymorgan2.paymentschedulecalculator.service.PaymentScheduleCalculatorService;
 import com.github.henrymorgan2.paymentschedulecalculator.service.mq.KafkaProducer;
 import com.github.henrymorgan2.paymentschedulecalculator.utils.GenerationPDF;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class PaymentScheduleCalculatorController {
@@ -32,16 +33,15 @@ public class PaymentScheduleCalculatorController {
         try {
 
             String encoded = Base64.getEncoder().encodeToString(generationPDF.generatePdfFromList(paymentSchedule));
-            System.out.println(encoded);
-            kafkaProducer.sendReport(requestDTO.getUser_email(), encoded);
+
+            PaymentScheduleCalculatorDto paymentScheduleCalculatorDto = new PaymentScheduleCalculatorDto(encoded);
+
+            kafkaProducer.sendReport(requestDTO.getUserEmail(), paymentScheduleCalculatorDto);
 
 
         } catch (com.itextpdf.text.DocumentException e) {
             throw new RuntimeException(e);
         }
-
-
-
 
         return "OK";
     }
