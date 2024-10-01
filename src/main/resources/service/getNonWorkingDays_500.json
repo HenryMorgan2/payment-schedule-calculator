@@ -1,0 +1,4 @@
+{
+  "errorMassage": "Не удалось установить соединение с сервисом: getNonWorkingDays",
+  "errorCode": 500
+}
